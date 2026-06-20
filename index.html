@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Estado de Resultados MH</title>
+<style>
+:root{--verde-jd:#367C2B;--verde-oscuro:#2d6322;--amarillo-jd:#FFDE00;--gris-bg:#fafbfc;--gris-border:#e8eaed;--gris-text:#5f6368;--blanco:#FFFFFF;--negro:#1a1a1a;--rojo:#d33b27}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',sans-serif;background:var(--gris-bg);color:var(--negro);line-height:1.5;color-scheme:light}
+.container{max-width:1600px;margin:0 auto;padding:24px}
+.header{background:linear-gradient(135deg,var(--verde-jd) 0%,var(--verde-oscuro) 100%);padding:28px 32px;border-radius:8px;margin-bottom:24px;box-shadow:0 2px 8px rgba(54,124,43,.15)}
+.header h1{font-size:28px;font-weight:600;color:white;margin-bottom:8px}
+.header-meta{display:flex;gap:20px;font-size:12px;color:rgba(255,255,255,.85);flex-wrap:wrap;margin-top:12px}
+.mes-selector{background:var(--blanco);padding:16px 20px;border-radius:6px;margin-bottom:24px;border:1px solid var(--gris-border);display:flex;gap:12px;align-items:center}
+.mes-selector label{font-size:12px;text-transform:uppercase;font-weight:700;color:var(--verde-jd);letter-spacing:.3px}
+.mes-selector select{padding:8px 12px;border:1px solid var(--gris-border);border-radius:4px;font-size:13px;cursor:pointer;background:white;color:var(--negro)}
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin-bottom:32px}
+.card{background:var(--blanco);padding:20px;border-radius:8px;border:1px solid var(--gris-border);border-left:3px solid var(--verde-jd)}
+.card-label{font-size:11px;text-transform:uppercase;color:var(--gris-text);margin-bottom:8px;font-weight:700;letter-spacing:.3px}
+.card-value{font-size:24px;font-weight:700;color:var(--verde-jd)}
+.card-value.negative{color:var(--rojo)}
+.linea{background:var(--blanco);border:1px solid var(--gris-border);border-radius:8px;padding:20px;margin-bottom:20px}
+.linea-title{font-size:18px;font-weight:700;color:var(--verde-jd);border-bottom:2px solid var(--verde-jd);padding-bottom:12px;margin-bottom:16px}
+.conceptos{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.concepto{background:var(--gris-bg);padding:12px;border-radius:6px;border:1px solid var(--gris-border)}
+.concepto-title{font-size:11px;text-transform:uppercase;font-weight:700;color:var(--gris-text);margin-bottom:8px;letter-spacing:.3px}
+.valor{font-size:12px;display:flex;justify-content:space-between;margin-bottom:4px;padding:4px 0}
+.valor-label{color:var(--gris-text);font-weight:600}
+.valor-numero{color:var(--verde-jd);font-weight:700}
+.valor-numero.negative{color:var(--rojo)}
+.footer{border-top:2px solid var(--gris-border);padding-top:24px;margin-top:32px;text-align:center;font-size:12px;color:var(--gris-text)}
+.disclaimer{background:#f5f5f5;border:1px solid var(--gris-border);border-radius:6px;padding:12px;margin-top:16px;font-size:11px;color:#666;text-align:center}
+.insights-section{background:linear-gradient(135deg,#f0f7ee 0%,#fefbf0 100%);border-left:4px solid var(--verde-jd);padding:16px;margin-bottom:24px;border-radius:6px}
+.insights-title{font-size:14px;font-weight:700;color:var(--verde-jd);margin-bottom:12px}
+.insight-item{font-size:12px;line-height:1.6;margin-bottom:8px;color:#333}
+.insight-item:before{content:"• ";color:var(--verde-jd);font-weight:700;margin-right:6px}
+.linea-insight{font-size:12px;line-height:1.6;padding:12px;margin-top:12px;background:rgba(54,124,43,0.05);border-left:3px solid var(--amarillo-jd);border-radius:4px}
+.linea-insight-list{list-style:none;padding:0;margin:0}
+.linea-insight-list li{margin-bottom:8px;padding-left:20px;position:relative;font-size:12px;line-height:1.6;color:#333}
+.linea-insight-list li:before{content:"• ";position:absolute;left:0;color:var(--verde-jd);font-weight:700}
+.insight-critical-alert{background:#fee;border-left:4px solid var(--rojo);padding:10px;margin-bottom:8px;border-radius:4px;font-size:12px;line-height:1.6}
+.recommendation{background:#f0f7ee;border-left:4px solid var(--verde-jd);padding:10px;margin-bottom:8px;border-radius:4px;font-size:12px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<h1>Estado de Resultados</h1>
+<div class="header-meta">
+<span id="periodo">Período: Junio 2026 (Mes Individual)</span>
+<span>Maquinaria del Humaya</span>
+<span id="lastUpdate">Actualizado: --</span>
+</div>
+</div>
+
+<div class="mes-selector">
+<label for="mesSelector">Período:</label>
+<select id="mesSelector">
+<option value="junio">Junio 2026</option>
+<option value="mayo">Mayo 2026</option>
+<option value="abril">Abril 2026</option>
+<option value="marzo">Marzo 2026</option>
+<option value="febrero">Febrero 2026</option>
+<option value="enero">Enero 2026</option>
+</select>
+</div>
+
+<div class="summary" id="summaryContainer"></div>
+
+<div class="insights-section" id="insightsGenerales">
+<div class="insights-title">Análisis Estratégico</div>
+<div id="insightsContent"></div>
+</div>
+
+<div id="lineasContainer"></div>
+
+<div class="footer">
+<p>Maquinaria del Humaya S.A. de C.V. | Distribuidor John Deere</p>
+<div class="disclaimer">
+<strong>⚠ INFORMACIÓN CONFIDENCIAL</strong><br/>
+Reporte para Dirección de Planeación Estratégica. Distribuir únicamente bajo autorización.
+</div>
+</div>
+</div>
+
+<script>
+function formatNumero(n){
+  return new Intl.NumberFormat('es-MX',{minimumFractionDigits:0,maximumFractionDigits:0}).format(Math.round(n));
+}
+
+const datos={
+junio:{mes:"Junio 2026",totales:{ventas:25116097,bruta:4259365,gastos:3419121,operacional:-303103},lineas:[
+{nombre:"MAQUINARIA",ventas:{real:9488449,proy:35631116,y2025:32311007},mg:{real:14.22,proy:15.12,y2025:18.07},gastos:{real:1069985,proy:2046778,y2025:2081674},util:{real:279494,proy:3341467,y2025:3755600}},
+{nombre:"REFACCIONES",ventas:{real:7263639,proy:16626855,y2025:10913371},mg:{real:21.70,proy:23.60,y2025:26.76},gastos:{real:924650,proy:1813773,y2025:1637229},util:{real:651679,proy:2110421,y2025:1282746}},
+{nombre:"SERVICIO",ventas:{real:1807171,proy:4732000,y2025:3832858},mg:{real:27.72,proy:42.97,y2025:33.94},gastos:{real:480480,proy:1075954,y2025:1027739},util:{real:20513,proy:957182,y2025:273294}},
+{nombre:"PRODUCTOS ALIADOS",ventas:{real:245345,proy:3330000,y2025:3181453},mg:{real:15.42,proy:20.35,y2025:19.70},gastos:{real:191457,proy:449670,y2025:442855},util:{real:-153621,proy:227980,y2025:183770}},
+{nombre:"FERRETERÍA",ventas:{real:1088271,proy:4618327,y2025:3872764},mg:{real:15.09,proy:14.82,y2025:13.24},gastos:{real:113921,proy:225137,y2025:202981},util:{real:50312,proy:459401,y2025:309893}},
+{nombre:"SISTEMAS DE RIEGO",ventas:{real:2072248,proy:5247714,y2025:1089856},mg:{real:14.85,proy:16.80,y2025:16.07},gastos:{real:237978,proy:456222,y2025:363477},util:{real:69654,proy:425477,y2025:-188367}},
+{nombre:"AMS",ventas:{real:373891,proy:1282510,y2025:1035553},mg:{real:43.85,proy:31.44,y2025:28.01},gastos:{real:73878,proy:182914,y2025:297741},util:{real:90060,proy:220262,y2025:-7733}},
+{nombre:"DRONES",ventas:{real:2655123,proy:2911000,y2025:3364578},mg:{real:23.28,proy:22.63,y2025:20.55},gastos:{real:210164,proy:385886,y2025:355132},util:{real:408061,proy:272732,y2025:336377}},
+{nombre:"SEMINUEVOS",ventas:{real:121960,proy:6400000,y2025:7594292},mg:{real:-376.60,proy:-1.94,y2025:10.14},gastos:{real:116608,proy:190213,y2025:208248},util:{real:-575907,proy:-314584,y2025:561447}}
+]},
+mayo:{mes:"Mayo 2026",totales:{ventas:53219289,bruta:10389729,gastos:6486446,operacional:1962083},lineas:[
+{nombre:"MAQUINARIA",ventas:{real:22857330,proy:31524876,y2025:21746131},mg:{real:18.02,proy:15.13,y2025:16.43},gastos:{real:1911763,proy:1999622,y2025:2448439},util:{real:2206690,proy:2769400,y2025:1124701}},
+{nombre:"REFACCIONES",ventas:{real:13769580,proy:15788449,y2025:13645217},mg:{real:25.12,proy:23.59,y2025:25.32},gastos:{real:1621305,proy:1873370,y2025:1765744},util:{real:1837922,proy:1851284,y2025:1689788}},
+{nombre:"SERVICIO",ventas:{real:3974908,proy:4275000,y2025:4050666},mg:{real:38.55,proy:43.91,y2025:39.46},gastos:{real:1114394,proy:1147895,y2025:939366},util:{real:418036,proy:729286,y2025:659008}},
+{nombre:"PRODUCTOS ALIADOS",ventas:{real:2486241,proy:2840000,y2025:2329806},mg:{real:19.63,proy:20.35,y2025:19.31},gastos:{real:313632,proy:359621,y2025:384955},util:{real:174397,proy:218353,y2025:64841}},
+{nombre:"FERRETERÍA",ventas:{real:3140911,proy:3054091,y2025:2660952},mg:{real:13.45,proy:14.78,y2025:15.24},gastos:{real:190675,proy:206084,y2025:185263},util:{real:231652,proy:245311,y2025:220176}},
+{nombre:"SISTEMAS DE RIEGO",ventas:{real:1385484,proy:1405000,y2025:314350},mg:{real:1.43,proy:16.53,y2025:10.20},gastos:{real:397307,proy:399687,y2025:421384},util:{real:-377441,proy:-167409,y2025:-389314}},
+{nombre:"AMS",ventas:{real:965017,proy:512755,y2025:1860466},mg:{real:32.01,proy:37.54,y2025:24.26},gastos:{real:161020,proy:171150,y2025:616847},util:{real:147925,proy:21363,y2025:-165558}},
+{nombre:"DRONES",ventas:{real:1597188,proy:876000,y2025:0},mg:{real:24.50,proy:22.88,y2025:0},gastos:{real:415214,proy:346945,y2025:0},util:{real:-23912,proy:-146560,y2025:0}},
+{nombre:"SEMINUEVOS",ventas:{real:3042630,proy:4362500,y2025:4788628},mg:{real:-11.53,proy:0.41,y2025:7.63},gastos:{real:361136,proy:445232,y2025:417617},util:{real:-711985,proy:-427547,y2025:-52081}}
+]},
+abril:{mes:"Abril 2026",totales:{ventas:53838328,bruta:10177085,gastos:6517062,operacional:1662129},lineas:[
+{nombre:"MAQUINARIA",ventas:{real:28854385,proy:27602611,y2025:33406905},mg:{real:15.89,proy:15.10,y2025:10.11},gastos:{real:1983317,proy:1947777,y2025:1853684},util:{real:2602492,proy:2221108,y2025:1523204}},
+{nombre:"REFACCIONES",ventas:{real:11368951,proy:11680574,y2025:7756503},mg:{real:28.61,proy:23.57,y2025:29.76},gastos:{real:1782058,proy:1886470,y2025:1596346},util:{real:1470724,proy:867185,y2025:711818}},
+{nombre:"SERVICIO",ventas:{real:4145050,proy:4004000,y2025:2997162},mg:{real:42.21,proy:44.31,y2025:41.60},gastos:{real:1034005,proy:1105276,y2025:1010670},util:{real:715819,proy:668956,y2025:236186}},
+{nombre:"PRODUCTOS ALIADOS",ventas:{real:1690602,proy:2560000,y2025:2620701},mg:{real:19.98,proy:20.32,y2025:17.37},gastos:{real:327474,proy:348837,y2025:374147},util:{real:10282,proy:171339,y2025:81095}},
+{nombre:"FERRETERÍA",ventas:{real:1168564,proy:1839947,y2025:1526646},mg:{real:12.34,proy:14.79,y2025:12.56},gastos:{real:203443,proy:201178,y2025:162734},util:{real:-59281,proy:71012,y2025:28956}},
+{nombre:"SISTEMAS DE RIEGO",ventas:{real:423187,proy:879000,y2025:790106},mg:{real:21.97,proy:16.87,y2025:21.60},gastos:{real:409198,proy:403673,y2025:378853},util:{real:-316225,proy:-255422,y2025:-208178}},
+{nombre:"AMS",ventas:{real:300890,proy:192000,y2025:1225240},mg:{real:33.07,proy:100.00,y2025:24.80},gastos:{real:158029,proy:172541,y2025:611205},util:{real:-58527,proy:19459,y2025:-307397}},
+{nombre:"DRONES",ventas:{real:986699,proy:876000,y2025:0},mg:{real:39.84,proy:22.64,y2025:0},gastos:{real:424163,proy:342929,y2025:0},util:{real:-31069,proy:-144602,y2025:0}},
+{nombre:"SEMINUEVOS",ventas:{real:4900000,proy:5437500,y2025:2489655},mg:{real:-9.77,proy:5.56,y2025:12.40},gastos:{real:195375,proy:182791,y2025:159415},util:{real:-674191,proy:119338,y2025:149354}}
+]},
+marzo:{mes:"Marzo 2026",totales:{ventas:49721480,bruta:7216536,gastos:6947362,operacional:-1685989},lineas:[
+{nombre:"MAQUINARIA",ventas:{real:24532991,proy:17432631,y2025:22916355},mg:{real:12.47,proy:15.13,y2025:11.34},gastos:{real:1947654,proy:1928846,y2025:2050478},util:{real:1112383,proy:708470,y2025:548052}},
+{nombre:"REFACCIONES",ventas:{real:8815092,proy:11099135,y2025:9680315},mg:{real:22.48,proy:23.50,y2025:25.12},gastos:{real:1891977,proy:1853881,y2025:1632553},util:{real:89711,proy:754929,y2025:799015}},
+{nombre:"SERVICIO",ventas:{real:4030916,proy:4135000,y2025:3552682},mg:{real:34.86,proy:44.24,y2025:39.15},gastos:{real:1065962,proy:1130101,y2025:1025765},util:{real:339280,proy:699288,y2025:364983}},
+{nombre:"PRODUCTOS ALIADOS",ventas:{real:1318724,proy:2400000,y2025:1694893},mg:{real:18.13,proy:20.34,y2025:22.93},gastos:{real:349639,proy:357484,y2025:301715},util:{real:-110597,proy:130626,y2025:86923}},
+{nombre:"FERRETERÍA",ventas:{real:1532312,proy:1404659,y2025:1146630},mg:{real:13.12,proy:14.83,y2025:14.88},gastos:{real:209646,proy:201417,y2025:173248},util:{real:-8626,proy:6942,y2025:-2661}},
+{nombre:"SISTEMAS DE RIEGO",ventas:{real:1519606,proy:747000,y2025:1341886},mg:{real:8.65,proy:17.00,y2025:18.90},gastos:{real:452274,proy:411747,y2025:395530},util:{real:-320870,proy:-284731,y2025:-141868}},
+{nombre:"AMS",ventas:{real:325571,proy:16000,y2025:1389840},mg:{real:26.14,proy:100.00,y2025:24.02},gastos:{real:183407,proy:170255,y2025:660160},util:{real:-98298,proy:-154255,y2025:-326267}},
+{nombre:"DRONES",ventas:{real:4166268,proy:876000,y2025:0},mg:{real:24.97,proy:21.17,y2025:0},gastos:{real:488692,proy:343655,y2025:0},util:{real:551603,proy:-158206,y2025:0}},
+{nombre:"SEMINUEVOS",ventas:{real:3480000,proy:3112500,y2025:4480000},mg:{real:-26.65,proy:5.25,y2025:3.58},gastos:{real:358111,proy:199357,y2025:175914},util:{real:-1285410,proy:-35797,y2025:-15655}}
+]},
+febrero:{mes:"Febrero 2026",totales:{ventas:43252416,bruta:7382062,gastos:6546799,operacional:-1305286},lineas:[
+{nombre:"MAQUINARIA",ventas:{real:16921560,proy:18829505,y2025:14276193},mg:{real:14.07,proy:15.22,y2025:9.65},gastos:{real:1839805,proy:2002014,y2025:1877374},util:{real:541190,proy:863137,y2025:-499522}},
+{nombre:"REFACCIONES",ventas:{real:10563409,proy:11608409,y2025:10424170},mg:{real:21.63,proy:23.49,y2025:26.58},gastos:{real:1817759,proy:1924689,y2025:1615188},util:{real:467354,proy:802231,y2025:1156042}},
+{nombre:"SERVICIO",ventas:{real:3523999,proy:3925000,y2025:2802564},mg:{real:35.45,proy:44.59,y2025:30.95},gastos:{real:923398,proy:1222526,y2025:1179011},util:{real:325973,proy:527509,y2025:-311493}},
+{nombre:"PRODUCTOS ALIADOS",ventas:{real:907448,proy:2020000,y2025:1600828},mg:{real:10.69,proy:20.28,y2025:18.03},gastos:{real:356073,proy:381854,y2025:334854},util:{real:-259053,proy:27841,y2025:-46187}},
+{nombre:"FERRETERÍA",ventas:{real:1629114,proy:1808734,y2025:1534291},mg:{real:13.59,proy:14.48,y2025:13.08},gastos:{real:186828,proy:207802,y2025:159477},util:{real:34503,proy:54139,y2025:41249}},
+{nombre:"SISTEMAS DE RIEGO",ventas:{real:1601827,proy:781429,y2025:3173285},mg:{real:21.18,proy:16.98,y2025:15.98},gastos:{real:425649,proy:411187,y2025:343957},util:{real:-86385,proy:-278469,y2025:162994}},
+{nombre:"AMS",ventas:{real:310921,proy:48000,y2025:2141841},mg:{real:43.29,proy:100.00,y2025:19.38},gastos:{real:192698,proy:182961,y2025:722781},util:{real:-58096,proy:-134961,y2025:-307778}},
+{nombre:"DRONES",ventas:{real:5404138,proy:4060000,y2025:0},mg:{real:22.18,proy:22.91,y2025:0},gastos:{real:493500,proy:380811,y2025:0},util:{real:705128,proy:549420,y2025:0}},
+{nombre:"SEMINUEVOS",ventas:{real:2390000,proy:4575000,y2025:5080000},mg:{real:-21.94,proy:-6.47,y2025:12.06},gastos:{real:311089,proy:183682,y2025:175768},util:{real:-835353,proy:-479567,y2025:436817}}
+]},
+enero:{mes:"Enero 2026",totales:{ventas:38381217,bruta:8429763,gastos:7336464,operacional:-915125},lineas:[
+{nombre:"MAQUINARIA",ventas:{real:12988126,proy:13094635,y2025:16030831},mg:{real:15.69,proy:15.12,y2025:0.91},gastos:{real:2207040,proy:1969908,y2025:2405392},util:{real:-168990,proy:9653,y2025:-2259550}},
+{nombre:"REFACCIONES",ventas:{real:10248333,proy:11869707,y2025:10160960},mg:{real:23.77,proy:23.53,y2025:29.47},gastos:{real:2185114,proy:2126540,y2025:1899323},util:{real:251164,proy:665855,y2025:1095108}},
+{nombre:"SERVICIO",ventas:{real:3836324,proy:3993000,y2025:3492956},mg:{real:39.59,proy:44.54,y2025:44.82},gastos:{real:999874,proy:1118263,y2025:1198726},util:{real:519080,proy:660147,y2025:366752}},
+{nombre:"PRODUCTOS ALIADOS",ventas:{real:1365097,proy:1700000,y2025:578000},mg:{real:21.10,proy:20.27,y2025:14.11},gastos:{real:351253,proy:338576,y2025:325724},util:{real:-63225,proy:6029,y2025:-244178}},
+{nombre:"FERRETERÍA",ventas:{real:1470962,proy:1642674,y2025:1395715},mg:{real:15.03,proy:14.53,y2025:17.41},gastos:{real:227832,proy:198544,y2025:156213},util:{real:-6731,proy:40203,y2025:86733}},
+{nombre:"SISTEMAS DE RIEGO",ventas:{real:720702,proy:641429,y2025:956844},mg:{real:15.31,proy:16.66,y2025:14.39},gastos:{real:465472,proy:403040,y2025:377630},util:{real:-355111,proy:-296205,y2025:-239955}},
+{nombre:"AMS",ventas:{real:139879,proy:56000,y2025:3184539},mg:{real:87.17,proy:100.00,y2025:19.69},gastos:{real:213069,proy:181125,y2025:891859},util:{real:-91139,proy:-125125,y2025:-264905}},
+{nombre:"DRONES",ventas:{real:5511794,proy:4498000,y2025:0},mg:{real:23.70,proy:22.54,y2025:0},gastos:{real:484860,proy:387004,y2025:0},util:{real:821371,proy:626709,y2025:0}},
+{nombre:"SEMINUEVOS",ventas:{real:2100000,proy:2487500,y2025:2030000},mg:{real:18.52,proy:5.51,y2025:10.82},gastos:{real:201950,proy:177848,y2025:135150},util:{real:186878,proy:-40707,y2025:84518}}
+]}
+};
+
+function getMesActual(){
+  const meses=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const hoy=new Date();
+  return meses[hoy.getMonth()];
+}
+
+let mesCurrent=getMesActual();
+
+function generarInsightsGenerales(d){
+  const v=d.totales.ventas;
+  const vp=d.totales.operacional;
+  const lineasPositivas=d.lineas.filter(l=>l.util.real>0).length;
+  const lineasNegativas=d.lineas.filter(l=>l.util.real<0).length;
+  const mejorLinea=d.lineas.reduce((a,b)=>a.util.real>b.util.real?a:b);
+  const peorLinea=d.lineas.reduce((a,b)=>a.util.real<b.util.real?a:b);
+
+  const gastosTotales=d.totales.gastos;
+  const gastosPorVenta=(gastosTotales/v*100).toFixed(1);
+  const esCritico=vp<0 || lineasNegativas>4;
+
+  let html='<div style="margin-top:12px;">';
+
+  // Contexto
+  html+=`<div style="font-size:11px;color:#666;margin-bottom:12px;font-style:italic;">Nota: Datos al día actual vs Proyección (mes cerrado) y Real 2025 (mes cerrado)</div>`;
+
+  // Insight crítico si aplica
+  if(esCritico){
+    html+=`<div class="insight-critical-alert">CRÍTICO: ${vp<0?'Grupo en rojo. Utilidad negativa de $'+formatNumero(Math.abs(vp))+'. Los gastos ('+gastosPorVenta+'% de ventas) están comprometiendo rentabilidad.':'Desbalance severo: '+lineasNegativas+' líneas en déficit. Rentabilidad concentrada en pocas líneas.'}</div>`;
+  }
+
+  // Insight 1: Desempeño operacional
+  html+=`<div class="insight-item">Desempeño Operacional: Grupo con utilidad ${vp<0?'negativa':'positiva'} de $${formatNumero(Math.abs(vp))}. Gastos departamentales de ${gastosPorVenta}% sobre ventas ${vp<0?'están comprimiendo toda la bruta':'comparten espacio con margen'}. La estructura de costos ${vp<0?'requiere revisión urgente':'tiene margen de optimización'}.</div>`;
+
+  // Insight 2: Distribución de rentabilidad
+  const porcentajePositivas=(lineasPositivas/9*100).toFixed(0);
+  html+=`<div class="insight-item">Cartera de Negocios: ${lineasPositivas}/9 líneas (${porcentajePositivas}%) rentables, ${lineasNegativas} en rojo. ${mejorLinea.nombre} contribuye $${formatNumero(mejorLinea.util.real)}, mientras ${peorLinea.nombre} resta $${formatNumero(Math.abs(peorLinea.util.real))}. Distribución desigual indica desalineación en asignación de capital.</div>`;
+
+  // Insight 3: Oportunidades
+  html+=`<div class="insight-item">Oportunidades: ${vp<0?'Prioridad inmediata en líneas deficitarias. Evaluar continuidad o reestructura operativa.':'Consolidar líneas positivas mientras se resuelve rentabilidad en déficit. Mix desequilibrado limita potencial.'}</div>`;
+
+  // Recomendaciones estratégicas
+  html+=`<div style="margin-top:16px;border-top:1px solid #ddd;padding-top:12px;"><strong style="color:var(--verde-jd);font-size:12px;">Recomendaciones Estratégicas:</strong>`;
+  html+=`<div class="recommendation">1. ${vp<0?'Revisión inmediata de estructura de gastos fijos. Identificar oportunidades de reducción de 15-20% en próximas 4 semanas.':'Análisis de rentabilidad por SKU/cliente en líneas positivas para identificar oportunidades de margen. Objetivo: +2% en Q3.'}</div>`;
+  html+=`<div class="recommendation">2. ${vp<0?'Evaluar viabilidad de líneas deficitarias. Plan de acción (optimizar, pivotar o discontinuar) en 2 semanas.':'Diagnóstico de causas en líneas en rojo. Implementar plan de corrección (producto, pricing o gestión) en 3 semanas.'}</div>`;
+  html+='</div></div>';
+
+  return html;
+}
+
+function generarInsightLinea(ln){
+  const desv=((ln.ventas.real-ln.ventas.proy)*100/ln.ventas.proy).toFixed(1);
+  const varYoY=((ln.ventas.real-ln.ventas.y2025)*100/ln.ventas.y2025).toFixed(1);
+  const esCritica=ln.util.real<0 || Math.abs(desv)>30;
+
+  let insights=[];
+  let indiceCritico=-1;
+
+  // Insight 1: Desempeño vs proyección
+  if(Math.abs(desv)<10){
+    insights.push({texto:`Ventas de $${formatNumero(ln.ventas.real)} están en línea con proyección (desviación ${desv}%). La ejecución se alinea con lo planeado.`,critico:false});
+  }else if(desv<-20){
+    insights.push({texto:`Ventas reales de $${formatNumero(ln.ventas.real)} están significativamente por debajo de proyección $${formatNumero(ln.ventas.proy)} (-${Math.abs(desv)}%). Hay brecha importante que requiere investigación en demanda o capacidad de ejecución.`,critico:true});
+    indiceCritico=0;
+  }else if(desv>20){
+    insights.push({texto:`Ventas de $${formatNumero(ln.ventas.real)} superan proyección $${formatNumero(ln.ventas.proy)} (+${desv}%). Desempeño encima de lo esperado, pero validar si es sostenible o efecto puntual.`,critico:false});
+  }else{
+    insights.push({texto:`Ventas de $${formatNumero(ln.ventas.real)} versus proyección $${formatNumero(ln.ventas.proy)} muestran desviación moderada (${desv}%). Hay variabilidad que requiere seguimiento.`,critico:false});
+  }
+
+  // Insight 2: Eficiencia de margen
+  if(ln.mg.real<ln.mg.proy*0.85){
+    insights.push({texto:`Margen del ${ln.mg.real}% está por debajo de proyección ${ln.mg.proy}%, lo que indica presión de costos o pricing débil. Hay erosión en la eficiencia operativa de esta línea.`,critico:true});
+    if(indiceCritico<0) indiceCritico=1;
+  }else if(ln.mg.real>ln.mg.proy*1.15){
+    insights.push({texto:`Margen del ${ln.mg.real}% supera proyección ${ln.mg.proy}%. Control de costos está funcionando bien, hay oportunidad de escalar volumen sin sacrificar rentabilidad.`,critico:false});
+  }else{
+    insights.push({texto:`Margen del ${ln.mg.real}% está alineado con proyección ${ln.mg.proy}%. Control operativo es consistente.`,critico:false});
+  }
+
+  // Insight 3: Comparativa histórica y rentabilidad
+  if(ln.util.real<0){
+    insights.push({texto:`Genera pérdida de $${formatNumero(Math.abs(ln.util.real))} (vs $${formatNumero(ln.ventas.y2025)} en ventas año pasado, ${varYoY}%). Línea en rojo: requiere decisión si ajustar operación o evaluar continuidad.`,critico:true});
+    if(indiceCritico<0) indiceCritico=2;
+  }else if(varYoY<-15){
+    insights.push({texto:`Utilidad de $${formatNumero(ln.util.real)}, pero ventas cayeron ${varYoY}% vs año pasado. Hay contracción histórica que señala pérdida de participación o cambio en demanda.`,critico:true});
+    if(indiceCritico<0) indiceCritico=2;
+  }else if(varYoY>15){
+    insights.push({texto:`Utilidad de $${formatNumero(ln.util.real)}, con crecimiento de ventas de +${varYoY}% vs año pasado. Trayectoria positiva: línea ganando participación y rentabilidad.`,critico:false});
+  }else{
+    insights.push({texto:`Utilidad de $${formatNumero(ln.util.real)}, con evolución estable vs año pasado (${varYoY}%). Posición consistente.`,critico:false});
+  }
+
+  let html='<ul class="linea-insight-list">';
+  insights.forEach((insight,idx)=>{
+    if(idx===indiceCritico){
+      html+=`<li><strong style="color:var(--rojo);">CRÍTICO: </strong>${insight.texto}</li>`;
+    }else{
+      html+=`<li>${insight.texto}</li>`;
+    }
+  });
+  html+='</ul>';
+  return html;
+}
+
+function renderizar(){
+  const d=datos[mesCurrent];
+  document.getElementById('periodo').textContent=`Período: ${d.mes} (Individual)`;
+
+  // Calcular totales de proyección y 2025
+  let ventasProy=0, ventas2025=0, gastosProy=0, gastos2025=0, utilProy=0, util2025=0;
+  let brutaProy=0, bruta2025=0;
+
+  d.lineas.forEach(l=>{
+    ventasProy+=Number(l.ventas.proy)||0;
+    ventas2025+=Number(l.ventas.y2025)||0;
+    gastosProy+=Number(l.gastos.proy)||0;
+    gastos2025+=Number(l.gastos.y2025)||0;
+    utilProy+=Number(l.util.proy)||0;
+    util2025+=Number(l.util.y2025)||0;
+    brutaProy+=(Number(l.ventas.proy)||0)*(Number(l.mg.proy)||0)/100;
+    bruta2025+=(Number(l.ventas.y2025)||0)*(Number(l.mg.y2025)||0)/100;
+  });
+
+  let brutaMgReal='0.00', brutaMgProy='0.00', brutaMg2025='0.00';
+  let gastosPctReal='0.00', gastosPctProy='0.00', gastosPct2025='0.00';
+
+  if(d.totales.ventas>0){
+    brutaMgReal=((d.totales.bruta/d.totales.ventas)*100).toFixed(2);
+    gastosPctReal=((d.totales.gastos/d.totales.ventas)*100).toFixed(2);
+  }
+  if(ventasProy>0){
+    brutaMgProy=((brutaProy/ventasProy)*100).toFixed(2);
+    gastosPctProy=((gastosProy/ventasProy)*100).toFixed(2);
+  }
+  if(ventas2025>0){
+    brutaMg2025=((bruta2025/ventas2025)*100).toFixed(2);
+    gastosPct2025=((gastos2025/ventas2025)*100).toFixed(2);
+  }
+
+  // Líneas críticas y estrella
+  const lineasEnRojo=d.lineas.filter(l=>l.util.real<0);
+  const mejorLinea=d.lineas.reduce((a,b)=>a.util.real>b.util.real?a:b);
+  const superacionMejor=((mejorLinea.util.real-mejorLinea.util.proy)*100/mejorLinea.util.proy).toFixed(1);
+
+  const summary=`
+    <div class="card">
+      <div class="card-label">Ventas Netas</div>
+      <div class="card-value">$${formatNumero(d.totales.ventas)}</div>
+      <div style="font-size:11px;color:#666;margin-top:6px;">Real: $${formatNumero(d.totales.ventas)} | Proy: $${formatNumero(ventasProy)} | 2025: $${formatNumero(ventas2025)}</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Margen Bruto %</div>
+      <div class="card-value">${brutaMgReal}%</div>
+      <div style="font-size:11px;color:#666;margin-top:6px;">Real: ${brutaMgReal}% | Proy: ${brutaMgProy}% | 2025: ${brutaMg2025}%</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Gastos Departamento</div>
+      <div class="card-value">${gastosPctReal}%</div>
+      <div style="font-size:11px;color:#666;margin-top:6px;">Real: $${formatNumero(d.totales.gastos)} | Proy: $${formatNumero(gastosProy)} | 2025: $${formatNumero(gastos2025)}</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Utilidad Operacional</div>
+      <div class="card-value ${d.totales.operacional<0?'negative':''}">$${formatNumero(d.totales.operacional)}</div>
+      <div style="font-size:11px;color:#666;margin-top:6px;">Real: $${formatNumero(d.totales.operacional)} | Proy: $${formatNumero(utilProy)} | 2025: $${formatNumero(util2025)}</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Líneas Críticas</div>
+      <div class="card-value ${lineasEnRojo.length>0?'negative':''}">${lineasEnRojo.length}</div>
+      <div style="font-size:11px;color:#666;margin-top:6px;">${lineasEnRojo.length>0?lineasEnRojo.map(l=>l.nombre).join(', '):'Sin líneas en rojo'}</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Línea Estrella</div>
+      <div class="card-value">${mejorLinea.nombre}</div>
+      <div style="font-size:11px;color:#666;margin-top:6px;">Util: $${formatNumero(mejorLinea.util.real)} | ${superacionMejor<0?'':'+'}${superacionMejor}% vs proy</div>
+    </div>
+  `;
+  document.getElementById('summaryContainer').innerHTML=summary;
+
+  // Insights generales
+  const insightsGen=generarInsightsGenerales(d);
+  document.getElementById('insightsContent').innerHTML=insightsGen;
+
+  const lineas=d.lineas.map(ln=>`
+    <div class="linea">
+      <div class="linea-title">${ln.nombre}</div>
+      <div class="conceptos">
+        <div class="concepto">
+          <div class="concepto-title">Ventas Netas</div>
+          <div class="valor"><span class="valor-label">Real:</span><span class="valor-numero">$${formatNumero(ln.ventas.real)}</span></div>
+          <div class="valor"><span class="valor-label">Proy:</span><span class="valor-numero">$${formatNumero(ln.ventas.proy)}</span></div>
+          <div class="valor"><span class="valor-label">2025:</span><span class="valor-numero">$${formatNumero(ln.ventas.y2025)}</span></div>
+        </div>
+        <div class="concepto">
+          <div class="concepto-title">Margen Bruto %</div>
+          <div class="valor"><span class="valor-label">Real:</span><span class="valor-numero">${ln.mg.real.toFixed(2)}%</span></div>
+          <div class="valor"><span class="valor-label">Proy:</span><span class="valor-numero">${ln.mg.proy.toFixed(2)}%</span></div>
+          <div class="valor"><span class="valor-label">2025:</span><span class="valor-numero">${ln.mg.y2025.toFixed(2)}%</span></div>
+        </div>
+        <div class="concepto">
+          <div class="concepto-title">Gastos Dept</div>
+          <div class="valor"><span class="valor-label">Real:</span><span class="valor-numero">$${formatNumero(ln.gastos.real)}</span></div>
+          <div class="valor"><span class="valor-label">Proy:</span><span class="valor-numero">$${formatNumero(ln.gastos.proy)}</span></div>
+          <div class="valor"><span class="valor-label">2025:</span><span class="valor-numero">$${formatNumero(ln.gastos.y2025)}</span></div>
+        </div>
+        <div class="concepto">
+          <div class="concepto-title">Util. Operacional</div>
+          <div class="valor"><span class="valor-label">Real:</span><span class="valor-numero ${ln.util.real<0?'negative':''}">$${formatNumero(ln.util.real)}</span></div>
+          <div class="valor"><span class="valor-label">Proy:</span><span class="valor-numero ${ln.util.proy<0?'negative':''}">$${formatNumero(ln.util.proy)}</span></div>
+          <div class="valor"><span class="valor-label">2025:</span><span class="valor-numero ${ln.util.y2025<0?'negative':''}">$${formatNumero(ln.util.y2025)}</span></div>
+        </div>
+      </div>
+      <div class="linea-insight" style="margin-top:16px;">${generarInsightLinea(ln)}</div>
+    </div>
+  `).join('');
+  document.getElementById('lineasContainer').innerHTML=lineas;
+
+  const h=new Date();
+  const f=h.toLocaleDateString('es-MX',{weekday:'long',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  document.getElementById('lastUpdate').textContent=`Actualizado: ${f}`;
+}
+
+document.getElementById('mesSelector').addEventListener('change',(e)=>{mesCurrent=e.target.value;renderizar();});
+document.addEventListener('DOMContentLoaded',renderizar);
+</script>
+</body>
+</html>
