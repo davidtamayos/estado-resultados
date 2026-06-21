@@ -349,7 +349,7 @@ function renderizar(){
   const summary=`
     <div class="card">
       <div class="card-label">Ventas Netas</div>
-      <div class="card-value">$${formatNumero(d.totales.ventas)}</div>
+      <div class="card-value">$${formatNumero(d.totales.ventas)}<span style="font-size:16px;color:#6c757d;margin-left:8px;">${((d.totales.ventas/ventasProy)*100).toFixed(1)}%</span></div>
       <div style="font-size:11px;color:#666;margin-top:6px;">Real: $${formatNumero(d.totales.ventas)} | Proy: $${formatNumero(ventasProy)} | 2025: $${formatNumero(ventas2025)}</div>
     </div>
     <div class="card">
@@ -390,7 +390,7 @@ function renderizar(){
       <div class="conceptos">
         <div class="concepto">
           <div class="concepto-title">Ventas Netas</div>
-          <div class="valor"><span class="valor-label">Real:</span><span class="valor-numero">$${formatNumero(ln.ventas.real)}</span></div>
+          <div class="valor"><span class="valor-label">Real:</span><span class="valor-numero">$${formatNumero(ln.ventas.real)}</span><span style="font-size:11px;color:#6c757d;margin-left:4px;">${((ln.ventas.real/ln.ventas.proy)*100).toFixed(1)}%</span></div>
           <div class="valor"><span class="valor-label">Proy:</span><span class="valor-numero">$${formatNumero(ln.ventas.proy)}</span></div>
           <div class="valor"><span class="valor-label">2025:</span><span class="valor-numero">$${formatNumero(ln.ventas.y2025)}</span></div>
         </div>
