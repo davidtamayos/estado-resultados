@@ -71,7 +71,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
 <div class="summary" id="summaryContainer"></div>
 
 <div class="insights-section" id="insightsGenerales">
-<div class="insights-title">Análisis Estratégico</div>
+<div class="insights-title">Analisis Grupo</div>
 <div id="insightsContent"></div>
 </div>
 
@@ -242,7 +242,7 @@ function generarInsightsGenerales(d){
   html+=`<div class="insight-item">Oportunidades: ${vp<0?'Prioridad inmediata en líneas deficitarias. Evaluar continuidad o reestructura operativa.':'Consolidar líneas positivas mientras se resuelve rentabilidad en déficit. Mix desequilibrado limita potencial.'}</div>`;
 
   // Recomendaciones estratégicas
-  html+=`<div style="margin-top:16px;border-top:1px solid #ddd;padding-top:12px;"><strong style="color:var(--verde-jd);font-size:12px;">Recomendaciones Estratégicas:</strong>`;
+  html+=`<div style="margin-top:16px;border-top:1px solid #ddd;padding-top:12px;"><strong style="color:var(--verde-jd);font-size:12px;">Recomendaciones Grupo:</strong>`;
   html+=`<div class="recommendation">1. ${vp<0?'Revisión inmediata de estructura de gastos fijos. Identificar oportunidades de reducción de 15-20% en próximas 4 semanas.':'Análisis de rentabilidad por SKU/cliente en líneas positivas para identificar oportunidades de margen. Objetivo: +2% en Q3.'}</div>`;
   html+=`<div class="recommendation">2. ${vp<0?'Evaluar viabilidad de líneas deficitarias. Plan de acción (optimizar, pivotar o discontinuar) en 2 semanas.':'Diagnóstico de causas en líneas en rojo. Implementar plan de corrección (producto, pricing o gestión) en 3 semanas.'}</div>`;
   html+='</div></div>';
@@ -403,8 +403,11 @@ function renderizar(){
         <div class="concepto">
           <div class="concepto-title">Gastos Dept</div>
           <div class="valor"><span class="valor-label">Real:</span><span class="valor-numero">$${formatNumero(ln.gastos.real)}</span></div>
+          <div class="valor"><span class="valor-label">G/V:</span><span class="valor-numero ${(ln.gastos.real/ln.ventas.real*100)>(ln.gastos.proy/ln.ventas.proy*100)?'negative':''}">${ ((ln.gastos.real/ln.ventas.real)*100).toFixed(1)}%</span></div>
           <div class="valor"><span class="valor-label">Proy:</span><span class="valor-numero">$${formatNumero(ln.gastos.proy)}</span></div>
+          <div class="valor"><span class="valor-label">G/V:</span><span class="valor-numero">${((ln.gastos.proy/ln.ventas.proy)*100).toFixed(1)}%</span></div>
           <div class="valor"><span class="valor-label">2025:</span><span class="valor-numero">$${formatNumero(ln.gastos.y2025)}</span></div>
+          <div class="valor"><span class="valor-label">G/V:</span><span class="valor-numero">${((ln.gastos.y2025/ln.ventas.y2025)*100).toFixed(1)}%</span></div>
         </div>
         <div class="concepto">
           <div class="concepto-title">Util. Operacional</div>
