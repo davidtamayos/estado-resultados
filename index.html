@@ -62,6 +62,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
 <option value="febrero">Febrero 2026</option>
 <option value="enero">Enero 2026</option>
 </select>
+<span style="margin-left:24px;border-left:1px solid var(--gris-border);padding-left:24px;display:flex;gap:12px;align-items:center;">
+<label style="margin:0;"><input type="radio" name="modo" value="individual" checked> Individual</label>
+<label style="margin:0;"><input type="radio" name="modo" value="acumulado"> Acumulado</label>
+</span>
 </div>
 
 <div class="summary" id="summaryContainer"></div>
@@ -163,6 +167,47 @@ function getMesActual(){
 }
 
 let mesCurrent=getMesActual();
+let modoActual='individual';
+const ordenMeses=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+
+function getDataAcumulada(meshasta){
+  const indexHasta=ordenMeses.indexOf(meshasta);
+  if(indexHasta<0) return datos[meshasta];
+  const datosAcumulados={mes:`Enero a ${meshasta.charAt(0).toUpperCase()+meshasta.slice(1)} 2026 (Acumulado)`,totales:{ventas:0,bruta:0,gastos:0,operacional:0},lineas:{}};
+  for(let i=0;i<=indexHasta;i++){
+    const m=ordenMeses[i];
+    if(!datos[m]) continue;
+    const d=datos[m];
+    datosAcumulados.totales.ventas+=d.totales.ventas;
+    datosAcumulados.totales.bruta+=d.totales.bruta;
+    datosAcumulados.totales.gastos+=d.totales.gastos;
+    datosAcumulados.totales.operacional+=d.totales.operacional;
+    d.lineas.forEach(l=>{
+      if(!datosAcumulados.lineas[l.nombre]){
+        datosAcumulados.lineas[l.nombre]={nombre:l.nombre,ventas:{real:0,proy:0,y2025:0},mg:{real:0,proy:0,y2025:0},gastos:{real:0,proy:0,y2025:0},util:{real:0,proy:0,y2025:0}};
+      }
+      datosAcumulados.lineas[l.nombre].ventas.real+=l.ventas.real;
+      datosAcumulados.lineas[l.nombre].ventas.proy+=l.ventas.proy;
+      datosAcumulados.lineas[l.nombre].ventas.y2025+=l.ventas.y2025;
+      datosAcumulados.lineas[l.nombre].gastos.real+=l.gastos.real;
+      datosAcumulados.lineas[l.nombre].gastos.proy+=l.gastos.proy;
+      datosAcumulados.lineas[l.nombre].gastos.y2025+=l.gastos.y2025;
+      datosAcumulados.lineas[l.nombre].util.real+=l.util.real;
+      datosAcumulados.lineas[l.nombre].util.proy+=l.util.proy;
+      datosAcumulados.lineas[l.nombre].util.y2025+=l.util.y2025;
+    });
+  }
+  datosAcumulados.lineas=Object.values(datosAcumulados.lineas);
+  datosAcumulados.lineas.forEach(l=>{
+    const ventasReal=l.ventas.real;
+    const ventasProy=l.ventas.proy;
+    const ventas2025=l.ventas.y2025;
+    if(ventasReal>0) l.mg.real=(l.ventas.real>0?(l.util.real+l.gastos.real)/l.ventas.real*100:0);
+    if(ventasProy>0) l.mg.proy=(ventasProy>0?(l.util.proy+l.gastos.proy)/ventasProy*100:0);
+    if(ventas2025>0) l.mg.y2025=(ventas2025>0?(l.util.y2025+l.gastos.y2025)/ventas2025*100:0);
+  });
+  return datosAcumulados;
+}
 
 function generarInsightsGenerales(d){
   const v=d.totales.ventas;
@@ -261,8 +306,9 @@ function generarInsightLinea(ln){
 }
 
 function renderizar(){
-  const d=datos[mesCurrent];
-  document.getElementById('periodo').textContent=`Período: ${d.mes} (Individual)`;
+  const d=modoActual==='acumulado'?getDataAcumulada(mesCurrent):datos[mesCurrent];
+  const tipoVisualizacion=modoActual==='acumulado'?'(Acumulado)':'(Individual)';
+  document.getElementById('periodo').textContent=`Período: ${d.mes.includes('Acumulado')?d.mes:`${d.mes} ${tipoVisualizacion}`}`;
 
   // Calcular totales de proyección y 2025
   let ventasProy=0, ventas2025=0, gastosProy=0, gastos2025=0, utilProy=0, util2025=0;
@@ -378,6 +424,9 @@ function renderizar(){
 }
 
 document.getElementById('mesSelector').addEventListener('change',(e)=>{mesCurrent=e.target.value;renderizar();});
+document.querySelectorAll('input[name="modo"]').forEach(radio=>{
+  radio.addEventListener('change',(e)=>{modoActual=e.target.value;renderizar();});
+});
 document.addEventListener('DOMContentLoaded',renderizar);
 </script>
 </body>
